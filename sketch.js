@@ -20,6 +20,10 @@ let playerImg, bgImg;
 let jumpSfx, musicSfx;
 let musicStarted = false;
 
+let debugMode = false;
+let moonGravity = false;
+let showHitboxes = false;
+
 let playerAnis = {
   idle: { row: 0, frames: 4, frameDelay: 10 },
   run: { row: 1, frames: 4, frameDelay: 3 },
@@ -154,6 +158,23 @@ function startMusicIfNeeded() {
 
 function keyPressed() {
   startMusicIfNeeded();
+
+  // Toggle debug menu with backtick `
+  if (key === "`") {
+    debugMode = !debugMode;
+  }
+
+  // Toggle moon gravity (only when debug menu is open)
+  if (debugMode && key === "1") {
+    moonGravity = !moonGravity;
+    world.gravity.y = moonGravity ? 2 : GRAVITY;
+  }
+
+  // Toggle hitbox visibility
+  if (debugMode && key === "2") {
+    showHitboxes = !showHitboxes;
+    allSprites.debug = showHitboxes;
+  }
 }
 
 function mousePressed() {
@@ -221,4 +242,19 @@ function draw() {
 
   // --- KEEP IN VIEW ---
   player.pos.x = constrain(player.pos.x, FRAME_W / 2, VIEWW - FRAME_W / 2);
-}
+
+  // --- DEBUG SCREEN ---
+  if (debugMode) {
+    camera.off();
+    fill(0, 150);
+    rect(0, 0, 200, 70);
+
+    fill(255);
+    textSize(10);
+    text("DEBUG MENU", 10, 15);
+    text("1: Moon Gravity: " + (moonGravity ? "ON" : "OFF"), 10, 30);
+    text("2: Show Hitboxes: " + (showHitboxes ? "ON" : "OFF"), 10, 45);
+    text("` : Toggle Debug Menu", 10, 60);
+    camera.on();
+  }
+} // <-- THIS closes draw() and nothing else
